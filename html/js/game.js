@@ -1,9 +1,8 @@
 'use strict'
 
-let level, hash=location.hash.substring(1);
-if(hash>0 && hash<=60) {
-    level=hash;
-} else {
+let level = Number.parseInt(location.hash.substring(1));
+console.log(level);
+if(!level || level<1 || level>60) {
     level=1;
 }
 document.title='Sokoban, уровень '+level;
@@ -14,12 +13,12 @@ const maxHeight=20
 
 const spriteSize=64;
 
-let game_map=maps[level-1];
-
 const div = document.getElementById('game');
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext('2d');
 div.appendChild(canvas);
+
+let game_map = maps[level - 1];
 
 canvas.width = game_map[0].length*blockSize;
 canvas.height = game_map.length*blockSize;
@@ -118,9 +117,9 @@ function drawGame() {
         }
     }
     if(boxes>0) {
-        document.getElementById('result').innerHTML='Нужно передвинуть ящиков на своё место: ' + boxes + ' шт.';
+        document.getElementById('result').innerHTML = 'Нужно передвинуть ящиков на своё место: ' + boxes + ' шт.';
     } else {
-        document.getElementById('result').innerHTML='Вы победили! <a href="#'+(Number.parseInt(level)+1)+'">Следующий уровень</a>';
+        document.getElementById('result').innerHTML = 'Вы победили! <a href="." onclick="location.hash=\'' + (++level) +'\';location.reload();return false">Следующий уровень</a>';
     }
     return boxes;
 }
