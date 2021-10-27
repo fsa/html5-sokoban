@@ -1,37 +1,49 @@
 'use strict'
 
+// Настройки спрайтов и canvas
+const blockSize = 64;
+const sprite = {
+    filename: 'img/sokoban_tilesheet@2.png',
+    size: 128
+}
+// Получение номера уровня из якоря
 let level = Number.parseInt(location.hash.substring(1));
-console.log(level);
 if(!level || level<1 || level>60) {
     level=1;
 }
+
+let map = maps[level - 1];
 document.title='Sokoban, уровень '+level;
 
-const blockSize=32;
-const maxWidth=28;
-const maxHeight=20
-
-const spriteSize=64;
+sprite.xy = [0, sprite.size * 1, sprite.size * 2, sprite.size * 3, sprite.size * 4, sprite.size * 5, sprite.size * 6, sprite.size * 7, sprite.size * 8, sprite.size * 9, sprite.size * 10, sprite.size * 11, sprite.size * 12];
 
 const div = document.getElementById('game');
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext('2d');
 div.appendChild(canvas);
-
-let game_map = maps[level - 1];
-
-canvas.width = game_map[0].length*blockSize;
-canvas.height = game_map.length*blockSize;
-//cswwanvas.style.display = 'block';
-canvas.style.maxWidth = '100vws';
+canvas.width = map[0].length*blockSize;
+canvas.height = map.length*blockSize;
+canvas.style.display = 'block';
+canvas.style.maxWidth = '100%';
 canvas.style.maxHeight = '100vh';
 
-const sprites = new Image();
-sprites.src = 'img/sokoban_tilesheet.png';
 
-let player_x, player_y;
-let player_dir='d';
-let player_move=0;
+
+const sprites = new Image();
+sprites.src = sprite.filename;
+
+const player = {
+    x: null,
+    y: null,
+    dir: 'd',
+    move: 0,
+    step: function () {
+        this.move++;
+        if (this.move > 2) {
+            this.move = 0;
+        }
+    }
+}
 
 addEventListener('load', drawGame);
 // Управление с клавиатуры
@@ -103,12 +115,12 @@ function CheckAction() {
 // Основной код игры
 function drawGame() {
     let boxes=0;
-    for(let y=0;y<game_map.length;y++) {
-        for(let x=0;x<game_map[y].length;x++) {
-            let sym=game_map[y][x];
+    for(let y=0;y<map.length;y++) {
+        for(let x=0;x<map[y].length;x++) {
+            let sym=map[y][x];
             if(sym=='@') {
-                player_x=x;
-                player_y=y;
+                player.x=x;
+                player.y=y;
             }
             drawBlock(sym, x, y);
             if(sym=='*') {
@@ -129,219 +141,212 @@ function drawBlock(block, x, y) {
     ctx.clearRect(x*blockSize, y*blockSize, blockSize, blockSize);
     switch (block) {
         case 'X':
-            coord = {x: 512, y: 384};
+            coord = { x: sprite.xy[8], y: sprite.xy[6] };
             break;
         case '*':
-            coord = {x: 64, y: 0};
+            coord = { x: sprite.xy[1], y: sprite.xy[0] };
             break;
         case '/':
-            coord = {x: 128, y: 0};
+            coord = { x: sprite.xy[4], y: sprite.xy[0] };
             break;
         case '@':
         case '+':
             coord = getPlayer();
             break;
         case '.':
-            coord = {x: 768, y: 64};
+            coord = { x: sprite.xy[12], y: sprite.xy[2] };
             break;
         default:
             return;
     }
-    ctx.drawImage(sprites, coord.x, coord.y, spriteSize, spriteSize, x*blockSize, y*blockSize, blockSize, blockSize);
+    ctx.drawImage(sprites, coord.x, coord.y, sprite.size, sprite.size, x*blockSize, y*blockSize, blockSize, blockSize);
 }
 
 function getPlayer() {
-    switch (player_dir) {
+    switch (player.dir) {
         case 'd':
-            return {x: 0+player_move*spriteSize, y: 256};
+            return { x: sprite.xy[0] + player.move * sprite.size, y: sprite.xy[4] };
         case 'u':
-            return {x: 192+player_move*spriteSize, y: 256};
+            return { x: sprite.xy[3] + player.move * sprite.size, y: sprite.xy[4] };
         case 'r':
-            return {x: 0+player_move*spriteSize, y: 384};
+            return { x: sprite.xy[0] + player.move * sprite.size, y: sprite.xy[6] };
         case 'l':
-            return {x: 192+player_move*spriteSize, y: 384};
+            return { x: sprite.xy[3] + player.move * sprite.size, y: sprite.xy[6] };
     }
 }
 
 function moveBlockLeft(x, y) {
-    if(game_map[y][x-1]!=' ' && game_map[y][x-1]!='.') {
+    if(map[y][x-1]!=' ' && map[y][x-1]!='.') {
         return false;
     }
     let new_block, old_block;
-    switch(game_map[y][x]) {
+    switch(map[y][x]) {
         case '@':
-            new_block=game_map[y][x-1]=='.'?'+':'@';
+            new_block=map[y][x-1]=='.'?'+':'@';
             old_block=' ';
             break;
         case '+':
-            new_block=game_map[y][x-1]=='.'?'+':'@';
+            new_block=map[y][x-1]=='.'?'+':'@';
             old_block='.';
             break;
         case '*':
-            new_block=game_map[y][x-1]=='.'?'/':'*';
+            new_block=map[y][x-1]=='.'?'/':'*';
             old_block=' ';
             break;
         case '/':
-            new_block=game_map[y][x-1]=='.'?'/':'*';
+            new_block=map[y][x-1]=='.'?'/':'*';
             old_block='.';
             break;
         default:
             return false;
     }
-    let row=game_map[y];
-    game_map[y]=row.slice(0, x-1)+new_block+old_block+row.slice(x+1);
+    let row=map[y];
+    map[y]=row.slice(0, x-1)+new_block+old_block+row.slice(x+1);
     return true;
 }
 
 function moveBlockRight(x, y) {
-    if(game_map[y][x+1]!=' ' && game_map[y][x+1]!='.') {
+    if(map[y][x+1]!=' ' && map[y][x+1]!='.') {
         return false;
     }
     let new_block, old_block;
-    switch(game_map[y][x]) {
+    switch(map[y][x]) {
         case '@':
-            new_block=game_map[y][x+1]=='.'?'+':'@';
+            new_block=map[y][x+1]=='.'?'+':'@';
             old_block=' ';
             break;
         case '+':
-            new_block=game_map[y][x+1]=='.'?'+':'@';
+            new_block=map[y][x+1]=='.'?'+':'@';
             old_block='.';
             break;
         case '*':
-            new_block=game_map[y][x+1]=='.'?'/':'*';
+            new_block=map[y][x+1]=='.'?'/':'*';
             old_block=' ';
             break;
         case '/':
-            new_block=game_map[y][x+1]=='.'?'/':'*';
+            new_block=map[y][x+1]=='.'?'/':'*';
             old_block='.';
             break;
         default:
             return false;
     }
-    let row=game_map[y];
-    game_map[y]=row.slice(0, x)+old_block+new_block+row.slice(x+2);
+    let row=map[y];
+    map[y]=row.slice(0, x)+old_block+new_block+row.slice(x+2);
     return true;
 }
 
 function moveBlockUp(x, y) {
-    if(game_map[y-1][x]!=' ' && game_map[y-1][x]!='.') {
+    if(map[y-1][x]!=' ' && map[y-1][x]!='.') {
         return false;
     }
     let new_block, old_block;
-    switch(game_map[y][x]) {
+    switch(map[y][x]) {
         case '@':
-            new_block=game_map[y-1][x]=='.'?'+':'@';
+            new_block=map[y-1][x]=='.'?'+':'@';
             old_block=' ';
             break;
         case '+':
-            new_block=game_map[y-1][x]=='.'?'+':'@';
+            new_block=map[y-1][x]=='.'?'+':'@';
             old_block='.';
             break;
         case '*':
-            new_block=game_map[y-1][x]=='.'?'/':'*';
+            new_block=map[y-1][x]=='.'?'/':'*';
             old_block=' ';
             break;
         case '/':
-            new_block=game_map[y-1][x]=='.'?'/':'*';
+            new_block=map[y-1][x]=='.'?'/':'*';
             old_block='.';
             break;
         default:
             return false;
     }
-    let row_old=game_map[y];
-    let row_new=game_map[y-1];
-    game_map[y]=row_old.slice(0, x)+old_block+row_old.slice(x+1);
-    game_map[y-1]=row_new.slice(0, x)+new_block+row_new.slice(x+1);
+    let row_old=map[y];
+    let row_new=map[y-1];
+    map[y]=row_old.slice(0, x)+old_block+row_old.slice(x+1);
+    map[y-1]=row_new.slice(0, x)+new_block+row_new.slice(x+1);
     return true;
 }
 
 function moveBlockDown(x, y) {
-    if(game_map[y+1][x]!=' ' && game_map[y+1][x]!='.') {
+    if(map[y+1][x]!=' ' && map[y+1][x]!='.') {
         return false;
     }
     let new_block, old_block;
-    switch(game_map[y][x]) {
+    switch(map[y][x]) {
         case '@':
-            new_block=game_map[y+1][x]=='.'?'+':'@';
+            new_block=map[y+1][x]=='.'?'+':'@';
             old_block=' ';
             break;
         case '+':
-            new_block=game_map[y+1][x]=='.'?'+':'@';
+            new_block=map[y+1][x]=='.'?'+':'@';
             old_block='.';
             break;
         case '*':
-            new_block=game_map[y+1][x]=='.'?'/':'*';
+            new_block=map[y+1][x]=='.'?'/':'*';
             old_block=' ';
             break;
         case '/':
-            new_block=game_map[y+1][x]=='.'?'/':'*';
+            new_block=map[y+1][x]=='.'?'/':'*';
             old_block='.';
             break;
         default:
             return false;
     }
-    let row_old=game_map[y];
-    let row_new=game_map[y+1];
-    game_map[y]=row_old.slice(0, x)+old_block+row_old.slice(x+1);
-    game_map[y+1]=row_new.slice(0, x)+new_block+row_new.slice(x+1);
+    let row_old=map[y];
+    let row_new=map[y+1];
+    map[y]=row_old.slice(0, x)+old_block+row_old.slice(x+1);
+    map[y+1]=row_new.slice(0, x)+new_block+row_new.slice(x+1);
     return true;
 }
 
 function isBox(x,y) {
-    return game_map[y][x]=='*' || game_map[y][x]=='/';
+    return map[y][x]=='*' || map[y][x]=='/';
 }
 
 function movePlayerLeft() {
-    player_dir='l';
-    if(isBox(player_x-1,player_y)) {
-        moveBlockLeft(player_x-1,player_y);
+    player.dir='l';
+    if(isBox(player.x-1,player.y)) {
+        moveBlockLeft(player.x-1,player.y);
     }
-    if(moveBlockLeft(player_x, player_y)) {
-        player_x--;
+    if(moveBlockLeft(player.x, player.y)) {
+        player.x--;
     }
-    playerStep();
+    player.step();
     drawGame();
 }
 
 function movePlayerRight() {
-    player_dir='r';
-    if(isBox(player_x+1,player_y)) {
-        moveBlockRight(player_x+1,player_y);
+    player.dir='r';
+    if(isBox(player.x+1,player.y)) {
+        moveBlockRight(player.x+1,player.y);
     }
-    if(moveBlockRight(player_x, player_y)) {
-        player_x++;
+    if(moveBlockRight(player.x, player.y)) {
+        player.x++;
     }
-    playerStep();
+    player.step();
     drawGame();
 }
 
 function movePlayerUp() {
-    player_dir='u';
-    if(isBox(player_x,player_y-1)) {
-        moveBlockUp(player_x,player_y-1);
+    player.dir='u';
+    if(isBox(player.x,player.y-1)) {
+        moveBlockUp(player.x,player.y-1);
     }
-    if(moveBlockUp(player_x, player_y)) {
-        player_y--;
+    if(moveBlockUp(player.x, player.y)) {
+        player.y--;
     }
-    playerStep();
+    player.step();
     drawGame();
 }
 
 function movePlayerDown() {
-    player_dir='d';
-    if(isBox(player_x,player_y+1)) {
-        moveBlockDown(player_x,player_y+1);
+    player.dir='d';
+    if(isBox(player.x,player.y+1)) {
+        moveBlockDown(player.x,player.y+1);
     }
-    if(moveBlockDown(player_x, player_y)) {
-        player_y++;
+    if(moveBlockDown(player.x, player.y)) {
+        player.y++;
     }
-    playerStep();
+    player.step();
     drawGame();
-}
-
-function playerStep() {
-    player_move++;
-    if(player_move>2) {
-        player_move=0;
-    }
 }
