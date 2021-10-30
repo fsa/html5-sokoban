@@ -1,23 +1,27 @@
 'use strict'
 
 // Настройки спрайтов и canvas
-const blockSize = 64;
+const div = document.getElementById('game');
+
+const blockSize = Number(getComputedStyle(div).getPropertyValue('--canvas-block-size'));
 const sprite = {
-    filename: 'img/sokoban_tilesheet@2.png',
-    size: 128
+    filename: getComputedStyle(div).getPropertyValue('--sprites-filename'),
+    size: Number(getComputedStyle(div).getPropertyValue('--sprite-size'))
 }
 // Получение номера уровня из якоря
 let level = Number.parseInt(location.hash.substring(1));
-if(!level || level<1 || level>60) {
+if (level > maps.length) {
+    location.hash = "1";
+    location.reload();
+}
+if(!level || level<1) {
     level=1;
 }
-
 let map = maps[level - 1];
 document.title='Sokoban, уровень '+level;
 
 sprite.xy = [0, sprite.size * 1, sprite.size * 2, sprite.size * 3, sprite.size * 4, sprite.size * 5, sprite.size * 6, sprite.size * 7, sprite.size * 8, sprite.size * 9, sprite.size * 10, sprite.size * 11, sprite.size * 12];
 
-const div = document.getElementById('game');
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext('2d');
 div.appendChild(canvas);
@@ -25,7 +29,7 @@ canvas.width = map[0].length*blockSize;
 canvas.height = map.length*blockSize;
 canvas.style.display = 'block';
 canvas.style.maxWidth = '100%';
-canvas.style.maxHeight = '100vh';
+canvas.style.maxHeight = '80vh';
 
 
 
@@ -131,7 +135,7 @@ function drawGame() {
     if(boxes>0) {
         document.getElementById('result').innerHTML = 'Нужно передвинуть ящиков на своё место: ' + boxes + ' шт.';
     } else {
-        document.getElementById('result').innerHTML = 'Вы победили! <a href="." onclick="location.hash=\'' + (++level) +'\';location.reload();return false">Следующий уровень</a>';
+        document.getElementById('result').innerHTML = 'Вы победили!'+ (level<60?' <a href="." onclick="location.hash=\'' + (++level) +'\';location.reload();return false">Следующий уровень</a>':'');
     }
     return boxes;
 }

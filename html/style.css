@@ -1,7 +1,7 @@
 html, body {
-    height: 100%;
+    height: 100vh;
+    max-height: 100vh;
     margin: 0;
-    padding: 0;
     overflow: hidden;
     font-size: 16pt;
 }
@@ -12,21 +12,24 @@ body {
 
 #main {
     height: 100vh;
-    padding: 0;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
+    width: 100%;
+    display: grid;
+    grid-template-rows: 2rem auto;
     align-items: center;
-    align-content: center;
+    justify-items: center;
 }
 
 #result {
-    padding: 0.4rem;
     margin: 0;
+    padding: 0;
     text-align: center;
+    align-self: center;
 }
 
 #game {
-    padding: 0;
     margin: 0;
+    padding: 0;
+    --sprites-filename: img/sokoban_tilesheet@2.png;
+    --sprite-size: 128;
+    --canvas-block-size: 64;
 }
