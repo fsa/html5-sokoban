@@ -150,7 +150,7 @@ function drawBlock(block, x, y) {
         case '*':
             coord = { x: sprite.xy[1], y: sprite.xy[0] };
             break;
-        case '/':
+        case '&':
             coord = { x: sprite.xy[4], y: sprite.xy[0] };
             break;
         case '@':
@@ -194,11 +194,11 @@ function moveBlockLeft(x, y) {
             old_block='.';
             break;
         case '*':
-            new_block=map[y][x-1]=='.'?'/':'*';
+            new_block=map[y][x-1]=='.'?'&':'*';
             old_block=' ';
             break;
-        case '/':
-            new_block=map[y][x-1]=='.'?'/':'*';
+        case '&':
+            new_block=map[y][x-1]=='.'?'&':'*';
             old_block='.';
             break;
         default:
@@ -224,11 +224,11 @@ function moveBlockRight(x, y) {
             old_block='.';
             break;
         case '*':
-            new_block=map[y][x+1]=='.'?'/':'*';
+            new_block=map[y][x+1]=='.'?'&':'*';
             old_block=' ';
             break;
-        case '/':
-            new_block=map[y][x+1]=='.'?'/':'*';
+        case '&':
+            new_block=map[y][x+1]=='.'?'&':'*';
             old_block='.';
             break;
         default:
@@ -254,11 +254,11 @@ function moveBlockUp(x, y) {
             old_block='.';
             break;
         case '*':
-            new_block=map[y-1][x]=='.'?'/':'*';
+            new_block=map[y-1][x]=='.'?'&':'*';
             old_block=' ';
             break;
-        case '/':
-            new_block=map[y-1][x]=='.'?'/':'*';
+        case '&':
+            new_block=map[y-1][x]=='.'?'&':'*';
             old_block='.';
             break;
         default:
@@ -286,11 +286,11 @@ function moveBlockDown(x, y) {
             old_block='.';
             break;
         case '*':
-            new_block=map[y+1][x]=='.'?'/':'*';
+            new_block=map[y+1][x]=='.'?'&':'*';
             old_block=' ';
             break;
-        case '/':
-            new_block=map[y+1][x]=='.'?'/':'*';
+        case '&':
+            new_block=map[y+1][x]=='.'?'&':'*';
             old_block='.';
             break;
         default:
@@ -304,7 +304,7 @@ function moveBlockDown(x, y) {
 }
 
 function isBox(x,y) {
-    return map[y][x]=='*' || map[y][x]=='/';
+    return map[y][x]=='*' || map[y][x]=='&';
 }
 
 function movePlayerLeft() {
