@@ -50,6 +50,9 @@ const player = {
 }
 
 addEventListener('load', drawGame);
+addEventListener('hashchange', ()=>{
+    location.reload();
+});
 // Управление с клавиатуры
 addEventListener('keydown', movePlayer);
 function movePlayer(event) {
@@ -135,7 +138,7 @@ function drawGame() {
     if(boxes>0) {
         document.getElementById('result').innerHTML = 'Нужно передвинуть ящиков на своё место: ' + boxes + ' шт.';
     } else {
-        document.getElementById('result').innerHTML = 'Вы победили!'+ (level<60?' <a href="." onclick="location.hash=\'' + (++level) +'\';location.reload();return false">Следующий уровень</a>':'');
+        document.getElementById('result').innerHTML = 'Вы победили!'+ (level<60?' <a href="#' + (++level) +'">Следующий уровень</a>':'');
     }
     return boxes;
 }
