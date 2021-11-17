@@ -11,11 +11,13 @@ const sprite = {
 // Получение номера уровня из якоря
 let level = Number.parseInt(location.hash.substring(1));
 if (level > maps.length) {
+    alert('Неверный номер уровня: '+maps.length);
     location.hash = "1";
     location.reload();
 }
 if(!level || level<1) {
-    level=1;
+    location.hash = "1";
+    location.reload();
 }
 let map = maps[level - 1];
 document.title='Sokoban, уровень '+level;
