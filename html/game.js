@@ -11,7 +11,7 @@ const sprite = {
 // Получение номера уровня из якоря
 let level = Number.parseInt(location.hash.substring(1));
 if (level > maps.length) {
-    alert('Неверный номер уровня: '+maps.length);
+    alert('Неверный номер уровня, максимальный доступный уровень ' + maps.length);
     location.hash = "1";
     location.reload();
 }
@@ -71,6 +71,9 @@ function movePlayer(event) {
         case 40:
             movePlayerDown();
             break;
+        case 81:
+            cheat();
+            break;
     }
 }
 
@@ -122,6 +125,8 @@ function CheckAction() {
 }
 
 // Основной код игры
+const russian_digits = (number, txt, cases = [2, 0, 1, 1, 1, 2]) => txt[(number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5]];
+
 function drawGame() {
     let boxes=0;
     for(let y=0;y<map.length;y++) {
@@ -137,12 +142,25 @@ function drawGame() {
             }
         }
     }
-    if(boxes>0) {
-        document.getElementById('result').innerHTML = 'Нужно передвинуть ящиков на своё место: ' + boxes + ' шт.';
-    } else {
-        document.getElementById('result').innerHTML = 'Вы победили!'+ (level<60?' <a href="#' + (++level) +'">Следующий уровень</a>':'');
+    let message = 'Нужно передвинуть ещё ' + boxes + ' ' + russian_digits(boxes, ['ящик', 'ящика', 'ящиков']) + ' на их места.';
+    if(boxes==0) {
+        message = 'Вы победили!';
+        if (level < maps.length) {
+            message += ' <a href="#' + (++level) +'">Следующий уровень</a>';
+        } else {
+            message += ' Вы прошли все уровни!';
+        }
     }
+    document.getElementById('result').innerHTML = message;
     return boxes;
+}
+
+function cheat() {
+    for (let y = 0; y < map.length; y++) {
+        map[y] = map[y].replaceAll('*', ' ');
+        map[y] = map[y].replaceAll('.', '&');
+    }
+    drawGame();
 }
 
 function drawBlock(block, x, y) {
