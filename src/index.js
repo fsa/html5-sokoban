@@ -3,7 +3,6 @@ import './style.css';
 import "./img/sokoban_tilesheet@2.png";
 import { maps } from "./maps.js";
 
-console.log(maps);
 // Настройки спрайтов и canvas
 const div = document.getElementById("game");
 
