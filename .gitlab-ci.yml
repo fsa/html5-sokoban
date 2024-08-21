@@ -46,4 +46,6 @@ deploy-job:      # This job runs in the deploy stage.
   environment: production
   script:
     - echo "Deploying application..."
+    - rm -rf /www/sokoban/public/*
+    - cp -rf ${CI_PROJECT_DIR}/dist/* /www/sokoban/public/
     - echo "Application successfully deployed."
