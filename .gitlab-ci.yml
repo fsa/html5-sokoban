@@ -24,11 +24,7 @@ stages:          # List of stages for jobs, and their order of execution
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
   script:
-    - cd ${CI_PROJECT_DIR}
-    - echo "Current Directory Location:"
-    - pwd
-    - echo "Install NPM Step"
-    - npm install
+    - npm ci
     - npm run build
 
 unit-test-job:   # This job runs in the test stage.
