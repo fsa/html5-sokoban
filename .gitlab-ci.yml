@@ -1,0 +1,24 @@
+stages:
+  - build
+  - deploy
+
+build-job:
+  stage: build
+  script:
+    - npm ci
+    - npm run build
+  artifacts:
+    paths:
+    - dist/
+
+deploy-job:
+  stage: deploy
+  environment: production
+  script:
+    - echo "Deploying application..."
+    - rm -rf /var/www/sokoban/public/*
+    - cp -rf ${CI_PROJECT_DIR}/dist/* /var/www/sokoban/public/
+    - echo "Application successfully deployed."
+  artifacts:
+    paths:
+    - dist/
